@@ -1,37 +1,25 @@
-# ChronoFrame
+# WithYou
 
-<p align="center">
-  <img src="https://socialify.git.ci/HoshinoSuzumi/chronoframe/image?custom_description=Self-hosted+personal+gallery+application.&description=1&font=KoHo&forks=0&issues=0&logo=https%3A%2F%2Fgithub.com%2FHoshinoSuzumi%2Fchronoframe%2Fraw%2Frefs%2Fheads%2Fmain%2Fpublic%2Ffavicon.svg&name=1&owner=1&pattern=Plus&pulls=0&stargazers=0&theme=Auto" alt="Chronoframe">
-</p>
+<div align="center">
+  <img src="public/logo.png" width="120" alt="WithYou Logo" />
+  <p>您的自托管照片库，珍藏美好回忆。</p>
+  <p>基于 ChronoFrame 二次开发。</p>
+</div>
 
-<p align="center">
-  <a href="https://github.com/HoshinoSuzumi/chronoframe/releases/latest">
-    <img src="https://badgen.net/github/release/HoshinoSuzumi/chronoframe/stable?icon=docker&label=稳定" alt="Latest Release">
-  </a>
-  <a href="https://github.com/HoshinoSuzumi/chronoframe/releases?q=beta&expanded=false">
-    <img src="https://badgen.net/github/release/HoshinoSuzumi/chronoframe?icon=docker&label=测试" alt="Latest Nightly Release">
-  </a>
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-</p>
+## ✨ 简介
 
-<p align="center">
-  <a href="https://discord.gg/https://discord.gg/U4vQuydP2m">
-    <img src="https://dcbadge.limes.pink/api/server/https://discord.gg/U4vQuydP2m" alt="Discord Server" />
-  </a>
-</p>
+**WithYou** 是一款自托管的个人照片库应用，旨在帮助您组织和展示珍贵的照片回忆。它支持自动提取 EXIF 信息、在交互式地图上展示拍摄位置，并提供美观的瀑布流布局。
 
-<p align="center">
-  <a href="https://hellogithub.com/repository/HoshinoSuzumi/chronoframe" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=947d47ffe8404985908b266e187dec99&claim_uid=kLVoiAFPJaBtr1D&theme=neutral" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-  <a href="https://www.producthunt.com/products/chronoframe?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-chronoframe" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1029556&theme=neutral&t=1761159404569" alt="ChronoFrame - Self&#0045;hosted&#0032;photo&#0032;gallery&#0032;for&#0032;photographers&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-</p>
+> 本项目基于 [ChronoFrame](https://github.com/simonno3/chronoframe) 二次开发。
 
-**Languages:** [English](README.md) | 中文
+## 🚀 特性
 
-丝滑的照片展示和管理应用，支持多种图片格式和大尺寸图片渲染。
-
-[在线演示: TimoYin's Mems](https://lens.bh8.ga)
-
-## ✨ 特性
+- **瀑布流布局**：美观且响应式的照片展示
+- **地图视图**：在地图上探索您的照片足迹
+- **EXIF 解析**：自动提取并展示拍摄参数
+- **S3 兼容**：支持各类 S3 兼容对象存储 (AWS, 腾讯云 COS, MinIO 等)
+- **高性能**：基于服务端渲染 (SSR) 和图片优化技术
+- **隐私优先**：完全自托管，数据掌握在自己手中
 
 ### 🖼️ 强大的图片管理
 
