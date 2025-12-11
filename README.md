@@ -4,12 +4,7 @@
   <img src="public/logo.png" width="120" alt="WithYou Logo" />
   <p>您的自托管照片库，珍藏美好回忆。</p>
   <p>基于 ChronoFrame 二次开发。</p>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-  <img src="https://img.shields.io/github/stars/nianshu2022/WithYou?style=social" alt="GitHub stars">
-</p>
+</div>
 
 ## ✨ 简介
 
@@ -58,7 +53,7 @@
 ```bash
 # 管理员邮箱（必须）
 CFRAME_ADMIN_EMAIL=
-# 管理员用户名（可选，默认 WithYou）
+# 管理员用户名（可选，默认 ChronoFrame）
 CFRAME_ADMIN_NAME=
 # 管理员密码（可选，默认 CF1234@!）
 CFRAME_ADMIN_PASSWORD=
@@ -87,6 +82,15 @@ NUXT_PROVIDER_LOCAL_PATH=/app/data/storage
 NUXT_SESSION_PASSWORD=
 ```
 
+### Docker
+
+一行命令启动：
+
+```bash
+docker build -t withyou .
+docker run -d --name withyou -p 3000:3000 -v $(pwd)/data:/app/data --env-file .env withyou
+```
+
 ### Docker Compose（推荐）
 
 创建 `docker-compose.yml`：
@@ -111,20 +115,11 @@ services:
 docker-compose up -d
 ```
 
-### Docker
-
-一行命令启动：
-
-```bash
-docker build -t withyou .
-docker run -d --name withyou -p 3000:3000 -v $(pwd)/data:/app/data --env-file .env withyou
-```
-
 ## 📖 使用指南
 
 > 如未配置 `CFRAME_ADMIN_EMAIL` 和 `CFRAME_ADMIN_PASSWORD`，默认账号如下：
 >
-> - 邮箱: `admin@withyou.com`
+> - 邮箱: `admin@chronoframe.com`
 > - 密码: `CF1234@!`
 
 ### 登录到控制台
