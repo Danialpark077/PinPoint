@@ -15,8 +15,25 @@ const bodySchema = z.object({
     .optional(),
   country: z.string().trim().max(128).nullable().optional(),
   city: z.string().trim().max(128).nullable().optional(),
-  dateTaken: z.string().datetime().optional(),
+  dateTaken: z.string().datetime().nullable().optional(),
+  title: z.string().trim().max(512).nullable().optional(),
+  tags: z.array(z.string().trim().max(128)).max(64).optional(),
 })
+
+const normalizeTags = (tags: string[] | undefined) => {
+  if (!tags) return undefined
+  const seen = new Set<string>()
+  const normalized: string[] = []
+  for (const rawTag of tags) {
+    const trimmed = rawTag.trim()
+    if (!trimmed) continue
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    normalized.push(trimmed)
+  }
+  return normalized
+}
 
 export default eventHandler(async (event) => {
   await requireUserSession(event)
@@ -28,7 +45,9 @@ export default eventHandler(async (event) => {
     payload.location === undefined &&
     payload.dateTaken === undefined &&
     payload.country === undefined &&
-    payload.city === undefined
+    payload.city === undefined &&
+    payload.title === undefined &&
+    payload.tags === undefined
   ) {
     throw createError({
       statusCode: 400,
@@ -57,6 +76,24 @@ export default eventHandler(async (event) => {
   }
 
   const exifUpdates: Record<string, any> = {}
+
+  if (payload.title !== undefined) {
+    const titleValue =
+      payload.title !== null && payload.title.trim() !== ''
+        ? payload.title.trim()
+        : null
+    exifUpdates.Title = titleValue
+    exifUpdates.XPTitle = titleValue
+  }
+
+  const normalizedTags = normalizeTags(payload.tags)
+  if (normalizedTags !== undefined) {
+    const tagsValue = normalizedTags.length > 0 ? normalizedTags : null
+    exifUpdates.Subject = tagsValue
+    exifUpdates.Keywords = tagsValue
+    exifUpdates.XPKeywords =
+      normalizedTags.length > 0 ? normalizedTags.join('; ') : null
+  }
 
   // Handle Location for EXIF
   if (payload.location !== undefined && payload.location) {
@@ -139,6 +176,17 @@ export default eventHandler(async (event) => {
       
       updateData.locationName = null
     }
+  }
+
+  if (payload.title !== undefined) {
+    updateData.title =
+      payload.title !== null && payload.title.trim() === ''
+        ? null
+        : payload.title
+  }
+
+  if (normalizedTags !== undefined) {
+    updateData.tags = normalizedTags
   }
 
   if (payload.dateTaken !== undefined) {

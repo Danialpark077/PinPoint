@@ -130,19 +130,23 @@ const isEditModalOpen = ref(false)
 const isSavingMetadata = ref(false)
 
 interface BatchEditFormState {
-  location: { latitude: number; longitude: number } | null
-  country: string | null
-  city: string | null
-  dateTaken: string | null
+  title: string | undefined
+  tags: string[]
+  location: { latitude: number; longitude: number } | null | undefined
+  country: string | undefined
+  city: string | undefined
+  dateTaken: string | null | undefined
 }
 
 const isBatchEditModalOpen = ref(false)
 const isBatchSaving = ref(false)
 const batchEditFormState = reactive<BatchEditFormState>({
-  location: null,
-  country: null,
-  city: null,
-  dateTaken: null,
+  title: undefined,
+  tags: [],
+  location: undefined,
+  country: undefined,
+  city: undefined,
+  dateTaken: undefined,
 })
 const batchLocationSelection = ref<{
   latitude: number
@@ -152,9 +156,12 @@ const batchLocationSelection = ref<{
 const batchLocationLatModel = computed({
   get: () => batchLocationSelection.value?.latitude,
   set: (val) => {
-    if (typeof val === 'number') {
+    const num = Number(val)
+    if (!isNaN(num)) {
+      // Clamp latitude between -90 and 90
+      const clampedLat = Math.min(Math.max(num, -90), 90)
       batchLocationSelection.value = {
-        latitude: val,
+        latitude: clampedLat,
         longitude: batchLocationSelection.value?.longitude || 0,
       }
     }
@@ -164,10 +171,13 @@ const batchLocationLatModel = computed({
 const batchLocationLngModel = computed({
   get: () => batchLocationSelection.value?.longitude,
   set: (val) => {
-    if (typeof val === 'number') {
+    const num = Number(val)
+    if (!isNaN(num)) {
+      // Clamp longitude between -180 and 180
+      const clampedLng = Math.min(Math.max(num, -180), 180)
       batchLocationSelection.value = {
         latitude: batchLocationSelection.value?.latitude || 0,
-        longitude: val,
+        longitude: clampedLng,
       }
     }
   },
@@ -195,10 +205,12 @@ const handleBatchEditSubmit = async () => {
   if (selectedIds.value.length === 0) return
 
   if (
-    !batchEditFormState.location &&
-    !batchEditFormState.dateTaken &&
-    !batchEditFormState.country &&
-    !batchEditFormState.city
+    batchEditFormState.location === undefined &&
+    batchEditFormState.dateTaken === undefined &&
+    batchEditFormState.country === undefined &&
+    batchEditFormState.city === undefined &&
+    (batchEditFormState.title === undefined || batchEditFormState.title === '') &&
+    batchEditFormState.tags.length === 0
   ) {
     toast.add({
       title: $t('dashboard.photos.messages.noChangesProvided'),
@@ -211,12 +223,28 @@ const handleBatchEditSubmit = async () => {
   try {
     const payload = {
       photoIds: selectedIds.value,
-      location: batchEditFormState.location,
-      country: batchEditFormState.country,
-      city: batchEditFormState.city,
-      dateTaken: batchEditFormState.dateTaken
-        ? new Date(batchEditFormState.dateTaken).toISOString()
-        : undefined,
+      location: batchEditFormState.location
+        ? {
+            latitude: Math.max(
+              -90,
+              Math.min(90, batchEditFormState.location.latitude),
+            ),
+            longitude: Math.max(
+              -180,
+              Math.min(180, batchEditFormState.location.longitude),
+            ),
+          }
+        : batchEditFormState.location,
+      country: batchEditFormState.country || undefined, // empty string -> undefined (no change)
+      city: batchEditFormState.city || undefined,
+      title: batchEditFormState.title || undefined,
+      tags: batchEditFormState.tags.length > 0 ? batchEditFormState.tags : undefined,
+      dateTaken:
+        batchEditFormState.dateTaken === null
+          ? null
+          : batchEditFormState.dateTaken
+            ? new Date(batchEditFormState.dateTaken).toISOString()
+            : undefined,
     }
 
     await $fetch('/api/photos/batch/update', {
@@ -230,10 +258,12 @@ const handleBatchEditSubmit = async () => {
     })
     isBatchEditModalOpen.value = false
     // reset form
-    batchEditFormState.location = null
-    batchEditFormState.country = null
-    batchEditFormState.city = null
-    batchEditFormState.dateTaken = null
+    batchEditFormState.title = undefined
+    batchEditFormState.tags = []
+    batchEditFormState.location = undefined
+    batchEditFormState.country = undefined
+    batchEditFormState.city = undefined
+    batchEditFormState.dateTaken = undefined
     batchLocationSelection.value = null
 
     // clear selection and refresh
@@ -395,8 +425,10 @@ const locationLatModel = computed({
     if (val === undefined || val === '') return
     const num = Number(val)
     if (!isNaN(num)) {
+      // Clamp latitude between -90 and 90
+      const clampedLat = Math.min(Math.max(num, -90), 90)
       locationSelection.value = {
-        latitude: num,
+        latitude: clampedLat,
         longitude: locationSelection.value?.longitude ?? 0,
       }
       locationTouched.value = true
@@ -410,9 +442,11 @@ const locationLngModel = computed({
     if (val === undefined || val === '') return
     const num = Number(val)
     if (!isNaN(num)) {
+      // Clamp longitude between -180 and 180
+      const clampedLng = Math.min(Math.max(num, -180), 180)
       locationSelection.value = {
         latitude: locationSelection.value?.latitude ?? 0,
-        longitude: num,
+        longitude: clampedLng,
       }
       locationTouched.value = true
     }
@@ -1030,9 +1064,13 @@ const columns: TableColumn<Photo>[] = [
     accessorKey: 'location',
     header: $t('dashboard.photos.table.columns.location'),
     cell: ({ row }) => {
-      const { exif, city, country } = row.original
+      const { exif, city, country, latitude, longitude } = row.original
 
-      if (!exif?.GPSLongitude && !exif?.GPSLatitude) {
+      const hasCoordinates =
+        (typeof latitude === 'number' && typeof longitude === 'number') ||
+        (exif?.GPSLongitude && exif?.GPSLatitude)
+
+      if (!hasCoordinates) {
         return h(
           'span',
           { class: 'text-neutral-400 text-xs' },
@@ -1416,8 +1454,8 @@ const saveMetadataChanges = async () => {
     if (locationChanged.value) {
       payload.location = locationSelection.value
         ? {
-            latitude: locationSelection.value.latitude,
-            longitude: locationSelection.value.longitude,
+            latitude: Math.max(-90, Math.min(90, locationSelection.value.latitude)),
+            longitude: Math.max(-180, Math.min(180, locationSelection.value.longitude)),
           }
         : null
     }
@@ -2773,6 +2811,29 @@ onUnmounted(() => {
                 @submit="handleBatchEditSubmit"
               >
                 <UFormField
+                  :label="$t('dashboard.photos.editModal.fields.title')"
+                  name="title"
+                >
+                  <UInput
+                    v-model="batchEditFormState.title"
+                    class="w-full"
+                    :placeholder="$t('dashboard.photos.editModal.fields.title')"
+                  />
+                </UFormField>
+
+                <UFormField
+                  :label="$t('dashboard.photos.editModal.fields.tags')"
+                  name="tags"
+                  :help="$t('dashboard.photos.editModal.fields.tagsHint')"
+                >
+                  <UInputTags
+                    v-model="batchEditFormState.tags"
+                    icon="tabler:tags"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField
                   :label="$t('dashboard.photos.editModal.fields.dateTaken')"
                   name="dateTaken"
                 >
@@ -2917,7 +2978,15 @@ onUnmounted(() => {
                   <UButton
                     type="submit"
                     :loading="isBatchSaving"
-                    :disabled="isBatchSaving || (!batchEditFormState.location && !batchEditFormState.dateTaken && !batchEditFormState.country && !batchEditFormState.city)"
+                    :disabled="
+                      isBatchSaving ||
+                      (batchEditFormState.location === undefined &&
+                        batchEditFormState.dateTaken === undefined &&
+                        batchEditFormState.country === undefined &&
+                        batchEditFormState.city === undefined &&
+                        (batchEditFormState.title === undefined || batchEditFormState.title === '') &&
+                        batchEditFormState.tags.length === 0)
+                    "
                     icon="tabler:device-floppy"
                   >
                     {{ $t('dashboard.photos.editModal.actions.save') }}

@@ -1,9 +1,9 @@
 {
   "name": "pinpoint",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "author": {
-    "name": "Timothy Yin",
-    "email": "master@uniiem.com"
+    "name": "Nianshu",
+    "email": "nianshu2022@qq.com"
   },
   "license": "MIT",
   "type": "module",

@@ -260,7 +260,7 @@ const isRepoLinkHovering = ref(false)
         >
           <a
             ref="projectLink"
-            href="https://github.com/HoshinoSuzumi/chronoframe"
+            href="https://github.com/nianshu2022/PinPoint"
             target="_blank"
             rel="noopener noreferrer"
             class="hover:underline inline-flex items-center gap-0.5 group"
@@ -272,7 +272,7 @@ const isRepoLinkHovering = ref(false)
               class="inline-block text-sm -mt-px"
               mode="svg"
             />
-            ChronoFrame
+            PinPoint
             <AnimatePresence>
               <motion.span
                 v-if="isRepoLinkHovering"
