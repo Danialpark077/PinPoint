@@ -87,8 +87,8 @@ NUXT_SESSION_PASSWORD=
 一行命令启动：
 
 ```bash
-docker build -t withyou .
-docker run -d --name withyou -p 3000:3000 -v $(pwd)/data:/app/data --env-file .env withyou
+docker build -t pinpoint .
+docker run -d --name pinpoint -p 3000:3000 -v $(pwd)/data:/app/data --env-file .env pinpoint
 ```
 
 ### Docker Compose（推荐）
@@ -97,9 +97,9 @@ docker run -d --name withyou -p 3000:3000 -v $(pwd)/data:/app/data --env-file .e
 
 ```yaml
 services:
-  withyou:
+  pinpoint:
     build: .
-    container_name: withyou
+    container_name: pinpoint
     restart: unless-stopped
     ports:
       - '3000:3000'
@@ -186,7 +186,7 @@ pnpm dev
 ### 项目结构
 
 ```
-withyou/
+pinpoint/
 ├── app/                    # Nuxt 应用
 │   ├── components/         # 组件
 │   ├── pages/              # 页面路由
