@@ -45,6 +45,23 @@ const isSubmittingForm = ref(false)
 const selectedPhotoIds = ref<string[]>([])
 const coverPhotoId = ref('')
 const photoSelectorSearchQuery = ref('')
+const photoSelectorSearchField = ref('all')
+
+const { t } = useI18n()
+
+const searchFieldOptions = computed(() => [
+  { label: t('dashboard.photos.search.all'), value: 'all' },
+  { label: t('dashboard.photos.table.columns.id'), value: 'id' },
+  { label: t('dashboard.photos.table.columns.title'), value: 'title' },
+  { label: t('dashboard.photos.table.columns.tags'), value: 'tags' },
+  { label: t('dashboard.photos.table.columns.location'), value: 'location' },
+  { label: t('dashboard.photos.table.columns.dateTaken'), value: 'dateTaken' }
+])
+
+const currentSearchLabel = computed(() => {
+  const option = searchFieldOptions.value.find((o) => o.value === photoSelectorSearchField.value)
+  return option ? option.label : t('dashboard.photos.search.all')
+})
 
 const setNowForCreatedAt = () => {
   formData.createdAt = dayjs().format('YYYY-MM-DDTHH:mm')
@@ -273,11 +290,52 @@ const filteredPhotos = computed(() => {
   const query = photoSelectorSearchQuery.value.toLowerCase()
   if (!query) return allPhotos.value
 
-  return allPhotos.value.filter(
-    (photo) =>
-      (photo.title?.toLowerCase() || '').includes(query) ||
-      (photo.description?.toLowerCase() || '').includes(query),
-  )
+  const field = photoSelectorSearchField.value
+
+  return allPhotos.value.filter((photo) => {
+    let searchableText = ''
+
+    switch (field) {
+      case 'id':
+        searchableText = photo.id || ''
+        break
+      case 'title':
+        searchableText = photo.title || ''
+        break
+      case 'tags':
+        searchableText = photo.tags?.join(' ') || ''
+        break
+      case 'location':
+        searchableText = [
+          photo.city || '',
+          photo.country || '',
+          photo.locationName || '',
+        ].join(' ')
+        break
+      case 'dateTaken':
+        searchableText = photo.dateTaken || ''
+        break
+      case 'all':
+      default:
+        searchableText = [
+          photo.tags?.join(' ') || '',
+          photo.exif?.Make || '',
+          photo.exif?.Model || '',
+          photo.exif?.LensMake || '',
+          photo.exif?.LensModel || '',
+          photo.city || '',
+          photo.country || '',
+          photo.title || '',
+          photo.description || '',
+          photo.storageKey || '',
+          photo.locationName || '',
+          photo.id || '',
+          photo.dateTaken || '',
+        ].join(' ')
+        break
+    }
+    return searchableText.toLowerCase().includes(query)
+  })
 })
 
 onMounted(async () => {
@@ -736,14 +794,58 @@ const columns: any[] = [
                 <div
                   class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center"
                 >
-                  <UInput
-                    v-model="photoSelectorSearchQuery"
-                    icon="tabler:search"
-                    :placeholder="
-                      $t('dashboard.albums.modal.searchPlaceholder')
-                    "
-                    class="flex-1 text-sm"
-                  />
+                  <div class="flex rounded-md shadow-sm flex-1">
+                    <USelectMenu
+                      v-model="photoSelectorSearchField"
+                      :items="searchFieldOptions"
+                      value-key="value"
+                      label-key="label"
+                      :searchable="false"
+                      :search-input="false"
+                      class="w-32"
+                      :ui="{ rounded: 'rounded-l-md rounded-r-none' }"
+                    >
+                      <template #default="{ open }">
+                        <UButton
+                          color="white"
+                          variant="solid"
+                          class="rounded-r-none border-r-0 w-28 justify-between focus:ring-0"
+                          :class="[open ? 'ring-2 ring-primary-500 z-10' : '']"
+                          :ui="{ rounded: 'rounded-l-md rounded-r-none' }"
+                        >
+                          <span class="truncate block">{{
+                            currentSearchLabel
+                          }}</span>
+                          <Icon
+                            name="tabler:chevron-down"
+                            class="w-4 h-4 text-gray-400 shrink-0"
+                          />
+                        </UButton>
+                      </template>
+                    </USelectMenu>
+                    <UInput
+                      v-model="photoSelectorSearchQuery"
+                      icon="tabler:search"
+                      :placeholder="
+                        $t('dashboard.albums.modal.searchPlaceholder')
+                      "
+                      class="flex-1 text-sm"
+                      :ui="{
+                        rounded: 'rounded-l-none rounded-r-md',
+                        icon: { trailing: { pointer: '' } },
+                      }"
+                    >
+                      <template v-if="photoSelectorSearchQuery" #trailing>
+                        <UButton
+                          color="gray"
+                          variant="link"
+                          icon="tabler:x"
+                          :padded="false"
+                          @click="photoSelectorSearchQuery = ''"
+                        />
+                      </template>
+                    </UInput>
+                  </div>
                   <div
                     class="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-neutral-800 rounded-lg whitespace-nowrap"
                   >
