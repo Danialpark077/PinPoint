@@ -730,6 +730,20 @@ const livePhotoStats = computed(() => {
 
 const photoFilter = ref<'all' | 'livephoto' | 'static'>('all')
 
+const searchFieldOptions = computed(() => [
+  { label: $t('dashboard.photos.search.all'), value: 'all' },
+  { label: $t('dashboard.photos.table.columns.id'), value: 'id' },
+  { label: $t('dashboard.photos.table.columns.title'), value: 'title' },
+  { label: $t('dashboard.photos.table.columns.tags'), value: 'tags' },
+  { label: $t('dashboard.photos.table.columns.location'), value: 'location' },
+  { label: $t('dashboard.photos.table.columns.dateTaken'), value: 'dateTaken' }
+])
+
+const currentSearchLabel = computed(() => {
+  const option = searchFieldOptions.value.find((o) => o.value === activeFilters.value.searchField)
+  return option ? option.label : $t('dashboard.photos.search.all')
+})
+
 const filteredData = computed(() => {
   if (!filteredPhotos.value) return []
 
@@ -2293,21 +2307,29 @@ onUnmounted(() => {
           <div class="flex items-center gap-2">
             <!-- 搜索框 -->
             <div class="flex rounded-md shadow-sm">
-              <USelect
+              <USelectMenu
                 v-model="activeFilters.searchField"
-                :options="[
-                  { label: $t('dashboard.photos.search.all'), value: 'all' },
-                  { label: $t('dashboard.photos.table.columns.id'), value: 'id' },
-                  { label: $t('dashboard.photos.table.columns.title'), value: 'title' },
-                  { label: $t('dashboard.photos.table.columns.tags'), value: 'tags' },
-                  { label: $t('dashboard.photos.table.columns.location'), value: 'location' },
-                  { label: $t('dashboard.photos.table.columns.dateTaken'), value: 'dateTaken' }
-                ]"
-                option-attribute="label"
+                :options="searchFieldOptions"
                 value-attribute="value"
-                class="rounded-r-none border-r-0 w-28"
-                :ui="{ rounded: 'rounded-l-md rounded-r-none' }"
-              />
+                option-attribute="label"
+                :ui="{ width: 'w-32' }"
+              >
+                <template #default="{ open }">
+                  <UButton
+                    color="white"
+                    variant="solid"
+                    class="rounded-r-none border-r-0 w-28 justify-between focus:ring-0"
+                    :class="[open ? 'ring-2 ring-primary-500 z-10' : '']"
+                    :ui="{ rounded: 'rounded-l-md rounded-r-none' }"
+                  >
+                    <span class="truncate block">{{ currentSearchLabel }}</span>
+                    <Icon
+                      name="tabler:chevron-down"
+                      class="w-4 h-4 text-gray-400 shrink-0"
+                    />
+                  </UButton>
+                </template>
+              </USelectMenu>
               <UInput
                 v-model="activeFilters.search"
                 icon="tabler:search"
