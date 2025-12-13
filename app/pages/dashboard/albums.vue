@@ -239,23 +239,33 @@ const setCoverPhoto = (photoId: string) => {
 
 const areAllPhotosSelected = computed(() => {
   return (
-    allPhotos.value.length > 0 &&
-    selectedPhotoIds.value.length === allPhotos.value.length
+    filteredPhotos.value.length > 0 &&
+    filteredPhotos.value.every((p) => selectedPhotoIds.value.includes(p.id))
   )
 })
 
 const areSomePhotosSelected = computed(() => {
-  return (
-    selectedPhotoIds.value.length > 0 &&
-    selectedPhotoIds.value.length < allPhotos.value.length
-  )
+  if (filteredPhotos.value.length === 0) return false
+  const selectedCount = filteredPhotos.value.filter((p) =>
+    selectedPhotoIds.value.includes(p.id),
+  ).length
+  return selectedCount > 0 && selectedCount < filteredPhotos.value.length
 })
 
 const toggleAllPhotos = () => {
   if (areAllPhotosSelected.value) {
-    selectedPhotoIds.value = []
+    // Deselect all filtered photos
+    const filteredIds = new Set(filteredPhotos.value.map((p) => p.id))
+    selectedPhotoIds.value = selectedPhotoIds.value.filter(
+      (id) => !filteredIds.has(id),
+    )
   } else {
-    selectedPhotoIds.value = allPhotos.value.map((p) => p.id)
+    // Select all filtered photos
+    const currentSelected = new Set(selectedPhotoIds.value)
+    filteredPhotos.value.forEach((p) => {
+      currentSelected.add(p.id)
+    })
+    selectedPhotoIds.value = Array.from(currentSelected)
   }
 }
 

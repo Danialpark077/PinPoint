@@ -5,6 +5,7 @@ interface FilterOptions {
   cities: string[]
   ratings: number // 改为单个数字，表示最低评分
   search: string // 搜索关键词
+  searchField: string // 搜索字段
 }
 
 interface FilterStats {
@@ -22,7 +23,8 @@ const globalFilters = ref<FilterOptions>({
   lenses: [],
   cities: [],
   ratings: 0,
-  search: ''
+  search: '',
+  searchField: 'all', // 默认搜索所有字段
 })
 
 export function usePhotoFilters() {
@@ -124,21 +126,52 @@ export function usePhotoFilters() {
       // 搜索筛选
       if (activeFilters.value.search) {
         const searchTerm = activeFilters.value.search.toLowerCase()
-        const searchableFields = [
-          photo.tags?.join(' ') || '',
-          photo.exif?.Make || '',
-          photo.exif?.Model || '',
-          photo.exif?.LensMake || '',
-          photo.exif?.LensModel || '',
-          photo.city || '',
-          photo.country || '',
-          photo.title || '',
-          photo.description || '',
-          photo.storageKey || '',
-          photo.locationName || '',
-        ].join(' ').toLowerCase()
+        const field = activeFilters.value.searchField
+        
+        // 构建搜索字段内容
+        let searchableText = ''
+        
+        switch (field) {
+          case 'id':
+            searchableText = photo.id || ''
+            break
+          case 'title':
+            searchableText = photo.title || ''
+            break
+          case 'tags':
+            searchableText = photo.tags?.join(' ') || ''
+            break
+          case 'location':
+             searchableText = [
+              photo.city || '',
+              photo.country || '',
+              photo.locationName || ''
+            ].join(' ')
+            break
+          case 'dateTaken':
+             searchableText = photo.dateTaken || ''
+            break
+          case 'all':
+          default:
+            searchableText = [
+              photo.tags?.join(' ') || '',
+              photo.exif?.Make || '',
+              photo.exif?.Model || '',
+              photo.exif?.LensMake || '',
+              photo.exif?.LensModel || '',
+              photo.city || '',
+              photo.country || '',
+              photo.title || '',
+              photo.description || '',
+              photo.storageKey || '',
+              photo.locationName || '',
+              photo.id || '', // Include ID in global search as well
+              photo.dateTaken || ''
+            ].join(' ')
+            break
+        }
 
-        if (!searchableFields.includes(searchTerm)) {
+        if (!searchableText.toLowerCase().includes(searchTerm)) {
           return false
         }
       }

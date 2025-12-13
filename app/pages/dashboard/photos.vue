@@ -747,6 +747,9 @@ const filteredData = computed(() => {
 watch(
   () => filteredData.value,
   async (photos) => {
+    // 重置选择状态，因为列表内容已改变
+    rowSelection.value = {}
+
     if (photos && photos.length > 0) {
       const photoIds = photos.map((p: Photo) => p.id)
       await fetchReactions(photoIds)
@@ -2289,24 +2292,40 @@ onUnmounted(() => {
 
           <div class="flex items-center gap-2">
             <!-- 搜索框 -->
-            <UInput
-              v-model="activeFilters.search"
-              icon="tabler:search"
-              :placeholder="$t('dashboard.photos.toolbar.searchPlaceholder')"
-              size="sm"
-              class="w-full sm:w-64"
-              :ui="{ icon: { trailing: { pointer: '' } } }"
-            >
-              <template v-if="activeFilters.search" #trailing>
-                <UButton
-                  color="gray"
-                  variant="link"
-                  icon="tabler:x"
-                  :padded="false"
-                  @click="activeFilters.search = ''"
-                />
-              </template>
-            </UInput>
+            <div class="flex rounded-md shadow-sm">
+              <USelect
+                v-model="activeFilters.searchField"
+                :options="[
+                  { label: $t('dashboard.photos.search.all'), value: 'all' },
+                  { label: $t('dashboard.photos.table.columns.id'), value: 'id' },
+                  { label: $t('dashboard.photos.table.columns.title'), value: 'title' },
+                  { label: $t('dashboard.photos.table.columns.tags'), value: 'tags' },
+                  { label: $t('dashboard.photos.table.columns.location'), value: 'location' },
+                  { label: $t('dashboard.photos.table.columns.dateTaken'), value: 'dateTaken' }
+                ]"
+                option-attribute="label"
+                value-attribute="value"
+                class="rounded-r-none border-r-0 w-28"
+                :ui="{ rounded: 'rounded-l-md rounded-r-none' }"
+              />
+              <UInput
+                v-model="activeFilters.search"
+                icon="tabler:search"
+                :placeholder="$t('dashboard.photos.toolbar.searchPlaceholder')"
+                class="w-full sm:w-64"
+                :ui="{ rounded: 'rounded-l-none rounded-r-md', icon: { trailing: { pointer: '' } } }"
+              >
+                <template v-if="activeFilters.search" #trailing>
+                  <UButton
+                    color="gray"
+                    variant="link"
+                    icon="tabler:x"
+                    :padded="false"
+                    @click="activeFilters.search = ''"
+                  />
+                </template>
+              </UInput>
+            </div>
 
             <UPopover>
               <UTooltip :text="$t('ui.action.filter.tooltip')">

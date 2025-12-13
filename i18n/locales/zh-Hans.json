@@ -500,6 +500,9 @@
         "refresh": "刷新",
         "searchPlaceholder": "搜索标题、标签、相机..."
       },
+      "search": {
+        "all": "全部"
+      },
       "photoFilter": {
         "all": "全部照片",
         "livephoto": "Live Photo",

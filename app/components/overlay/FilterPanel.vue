@@ -257,8 +257,8 @@ const onShuffle = () => {
         <div class="space-y-0.5 max-h-64 overflow-y-auto">
           <div class="flex flex-wrap gap-1">
             <UBadge
-              v-for="city in availableFilters.cities"
-              :key="city.label"
+            v-for="city in availableFilters.cities"
+            :key="city.label"
               :label="city.label"
               :color="isFilterSelected('cities', city.label) ? 'info' : 'neutral'"
               :trailing-icon="
@@ -267,7 +267,7 @@ const onShuffle = () => {
               variant="soft"
               class="cursor-pointer select-none transition-colors"
               :class="`${isFilterSelected('cities', city.label) ? '' : 'bg-neutral-800/10 text-neutral-800 hover:bg-neutral-800/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20'}`"
-              @click="handleToggleFilter('cities', city.label)"
+            @click="handleToggleFilter('cities', city.label)"
             />
           </div>
           <div

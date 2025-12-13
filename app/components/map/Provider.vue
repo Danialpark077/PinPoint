@@ -47,7 +47,7 @@ const mapStyle = computed(() => {
     )
   } else {
     const token = mapConfig.value['maplibre.token']
-    if (!token && !mapConfig.value['maplibre.style']) {
+    if (false) { // Always use AMap logic below
       // Fallback to OSM raster tiles if no token and no custom style provided
       return {
         version: 8,
@@ -77,17 +77,50 @@ const mapStyle = computed(() => {
 
     const styleConfig =
       colorMode.value === 'dark' ? ChronoFrameDarkStyle : ChronoFrameLightStyle
+
+    // Default style (style=8) - Simplified map
+    // style=7 - Standard vector map (more details)
+    // style=6 - Satellite map
+    const mapStyleType = 8
+
+    const tileDomain = mapStyleType === 6 ? 'webst' : 'webrd'
+
     return (
       mapConfig.value['maplibre.style'] ||
       ({
         ...styleConfig,
         sources: {
           openmaptiles: {
-            ...styleConfig.sources?.openmaptiles,
-            url: `https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=${token}`,
+            type: 'raster',
+            tiles: [
+              `https://${tileDomain}01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=${mapStyleType}&x={x}&y={y}&z={z}`,
+              `https://${tileDomain}02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=${mapStyleType}&x={x}&y={y}&z={z}`,
+              `https://${tileDomain}03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=${mapStyleType}&x={x}&y={y}&z={z}`,
+              `https://${tileDomain}04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=${mapStyleType}&x={x}&y={y}&z={z}`,
+            ],
+            tileSize: 256,
+            attribution: '&copy; AutoNavi',
+            maxzoom: 18, // Specify maxzoom for the source to enable overzooming
           },
         },
-        glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${token}`,
+        layers: [
+          {
+            id: 'amap-layer',
+            type: 'raster',
+            source: 'openmaptiles',
+            minzoom: 0,
+            maxzoom: 24, // Allow layer to be visible at higher zoom levels (overzoom)
+            paint: {
+              // Adjust raster brightness for dark mode to reduce glare
+              'raster-brightness-max': colorMode.value === 'dark' ? 0.7 : 1,
+              'raster-saturation': colorMode.value === 'dark' ? -0.4 : 0,
+              'raster-contrast': colorMode.value === 'dark' ? 0.3 : 0,
+            },
+          },
+        ],
+        // Must provide a valid glyphs URL even if not used, or remove the property completely from the object if the type allows
+        // MapLibre validates this property strictly
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf', 
       } as StyleSpecification)
     )
   }
@@ -140,3 +173,4 @@ const mapStyle = computed(() => {
 </template>
 
 <style scoped></style>
+
